@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
 
   suricata:
@@ -13,11 +11,11 @@ services:
       - ./suricata:/etc/suricata
       - ./suricata/logs:/var/log/suricata
       - /var/lib/suricata/rules:/var/lib/suricata/rules
-    command: -i tzsp0 -i tzsp1
-    restart: unless-stopped
+    command: -i enp0s3
 
   fluentd:
-    image: fluent/fluentd:v1.16-debian-1
+    build: ./fluentd
+    # image: fluent/fluentd:v1.16-debian-1
     container_name: fluentd
     volumes:
       - ./fluentd/fluent.conf:/fluentd/etc/fluent.conf
@@ -25,11 +23,7 @@ services:
     ports:
       - "24224:24224"
     restart: unless-stopped
-    entrypoint: >
-      /bin/sh -c "
-      fluent-gem install fluent-plugin-opensearch --no-document &&
-      exec fluentd
-      "
+
 
   nginx:
     image: nginx:1.25
@@ -38,4 +32,22 @@ services:
       - "8080:80"
     volumes:
       - ./nginx:/usr/share/nginx/html
-    restart: unless-stopped
+
+  opensearch:
+    image: opensearchproject/opensearch:2.12.0
+    environment:
+      - discovery.type=single-node
+      - plugins.security.disabled=true
+      - DISABLE_INSTALL_DEMO_CONFIG=true
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Anatolievich_Siderenko
+    ports:
+     - "9200:9200"
+
+  dashboards:
+    image: opensearchproject/opensearch-dashboards:2.12.0
+    container_name: dashboards
+    ports:
+      - "5601:5601"
+    environment:
+      - OPENSEARCH_HOSTS=http://opensearch:9200
+      - DISABLE_SECURITY_DASHBOARDS_PLUGIN=true
