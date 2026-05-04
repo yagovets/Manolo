@@ -1,3 +1,4 @@
+arlos@debian:~/procisa$ sudo cat Installnuevo.sh
 
 #!/bin/bash
 
@@ -140,15 +141,10 @@ done
 echo "[EXTRA] Docker..."
 
 docker compose down || true
-docker compose up -d 
+docker compose up -d
 echo "Esperando a que Fluentd arranque..."
 sleep 10
 
-echo "Instalando plugin OpenSearch en Fluentd..."
-docker exec fluentd fluent-gem install fluent-plugin-opensearch --no-document || true
-
-echo "Reiniciando Fluentd..."
-docker restart fluentd
 echo "===================================="
 echo "   SISTEMA LISTO 🚀"
 echo "===================================="
