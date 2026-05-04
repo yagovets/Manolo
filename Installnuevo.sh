@@ -61,6 +61,17 @@ cat <<EOF > ./fluentd/fluent.conf
 </match>
 EOF
 
+cat <<EOF > ./fluentd/Dockerfile
+FROM fluent/fluentd:v1.16-1
+
+USER root
+
+RUN gem install fluent-plugin-opensearch
+
+USER fluent
+
+EOF
+
 # =====================================
 # 3. tzsp2pcap
 # =====================================
